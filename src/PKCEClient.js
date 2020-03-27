@@ -25,6 +25,10 @@ class PKCEClient {
     throw new Error('Must be implemented by a sub-class')
   }
 
+  generateRandomChallengePair () {
+    return generateRandomChallengePair()
+  }
+
   @boundMethod
   async exchangeCodeForToken (code, verifier) {
     const { domain, clientId } = this
