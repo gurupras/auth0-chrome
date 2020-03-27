@@ -1982,106 +1982,6 @@ PEMEncoder.prototype.encode = function encode(data, options) {
 
 /***/ }),
 
-/***/ "./node_modules/autobind-decorator/lib/esm/index.js":
-/*!**********************************************************!*\
-  !*** ./node_modules/autobind-decorator/lib/esm/index.js ***!
-  \**********************************************************/
-/*! exports provided: boundMethod, boundClass, default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "boundMethod", function() { return boundMethod; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "boundClass", function() { return boundClass; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return autobind; });
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-/**
- * Return a descriptor removing the value and returning a getter
- * The getter will return a .bind version of the function
- * and memoize the result against a symbol on the instance
- */
-function boundMethod(target, key, descriptor) {
-  var fn = descriptor.value;
-
-  if (typeof fn !== 'function') {
-    throw new TypeError("@boundMethod decorator can only be applied to methods not: ".concat(_typeof(fn)));
-  } // In IE11 calling Object.defineProperty has a side-effect of evaluating the
-  // getter for the property which is being replaced. This causes infinite
-  // recursion and an "Out of stack space" error.
-
-
-  var definingProperty = false;
-  return {
-    configurable: true,
-    get: function get() {
-      // eslint-disable-next-line no-prototype-builtins
-      if (definingProperty || this === target.prototype || this.hasOwnProperty(key) || typeof fn !== 'function') {
-        return fn;
-      }
-
-      var boundFn = fn.bind(this);
-      definingProperty = true;
-      Object.defineProperty(this, key, {
-        configurable: true,
-        get: function get() {
-          return boundFn;
-        },
-        set: function set(value) {
-          fn = value;
-          delete this[key];
-        }
-      });
-      definingProperty = false;
-      return boundFn;
-    },
-    set: function set(value) {
-      fn = value;
-    }
-  };
-}
-/**
- * Use boundMethod to bind all methods on the target.prototype
- */
-
-function boundClass(target) {
-  // (Using reflect to get all keys including symbols)
-  var keys; // Use Reflect if exists
-
-  if (typeof Reflect !== 'undefined' && typeof Reflect.ownKeys === 'function') {
-    keys = Reflect.ownKeys(target.prototype);
-  } else {
-    keys = Object.getOwnPropertyNames(target.prototype); // Use symbols if support is provided
-
-    if (typeof Object.getOwnPropertySymbols === 'function') {
-      keys = keys.concat(Object.getOwnPropertySymbols(target.prototype));
-    }
-  }
-
-  keys.forEach(function (key) {
-    // Ignore special case target method
-    if (key === 'constructor') {
-      return;
-    }
-
-    var descriptor = Object.getOwnPropertyDescriptor(target.prototype, key); // Only methods need binding
-
-    if (typeof descriptor.value === 'function') {
-      Object.defineProperty(target.prototype, key, boundMethod(target, key, descriptor));
-    }
-  });
-  return target;
-}
-function autobind() {
-  if (arguments.length === 1) {
-    return boundClass.apply(void 0, arguments);
-  }
-
-  return boundMethod.apply(void 0, arguments);
-}
-
-/***/ }),
-
 /***/ "./node_modules/base64-js/index.js":
 /*!*****************************************!*\
   !*** ./node_modules/base64-js/index.js ***!
@@ -25098,6 +24998,7 @@ module.exports = function(module) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _PKCEClient__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./PKCEClient */ "./src/PKCEClient.js");
+/* harmony import */ var _deferred__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./deferred */ "./src/deferred.js");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -25123,6 +25024,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 /* global chrome */
 
 
+
 var ChromeClient = /*#__PURE__*/function (_PKCEClient) {
   _inherits(ChromeClient, _PKCEClient);
 
@@ -25137,7 +25039,7 @@ var ChromeClient = /*#__PURE__*/function (_PKCEClient) {
   _createClass(ChromeClient, [{
     key: "getAuthResult",
     value: function getAuthResult(url, interactive) {
-      return new Promise(function (resolve, reject) {
+      return new _deferred__WEBPACK_IMPORTED_MODULE_1__["default"](function (resolve, reject) {
         chrome.identity.launchWebAuthFlow({
           url: url,
           interactive: interactive
@@ -25178,10 +25080,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _generateRandomChallengePair__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./generateRandomChallengePair */ "./src/generateRandomChallengePair.js");
 /* harmony import */ var url_parse__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! url-parse */ "./node_modules/url-parse/index.js");
 /* harmony import */ var url_parse__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(url_parse__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var autobind_decorator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! autobind-decorator */ "./node_modules/autobind-decorator/lib/esm/index.js");
 
-
-var _class;
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
@@ -25193,9 +25092,6 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) { var desc = {}; Object.keys(descriptor).forEach(function (key) { desc[key] = descriptor[key]; }); desc.enumerable = !!desc.enumerable; desc.configurable = !!desc.configurable; if ('value' in desc || desc.initializer) { desc.writable = true; } desc = decorators.slice().reverse().reduce(function (desc, decorator) { return decorator(target, property, desc) || desc; }, desc); if (context && desc.initializer !== void 0) { desc.value = desc.initializer ? desc.initializer.call(context) : void 0; desc.initializer = undefined; } if (desc.initializer === void 0) { Object.defineProperty(target, property, desc); desc = null; } return desc; }
-
-
 
 
 
@@ -25206,7 +25102,7 @@ var qs = url_parse__WEBPACK_IMPORTED_MODULE_2___default.a.qs;
   OAuth flows (like Windows?)
 */
 
-var PKCEClient = (_class = /*#__PURE__*/function () {
+var PKCEClient = /*#__PURE__*/function () {
   // These params will never change
   function PKCEClient(domain, clientId) {
     _classCallCheck(this, PKCEClient);
@@ -25370,7 +25266,8 @@ var PKCEClient = (_class = /*#__PURE__*/function () {
   }]);
 
   return PKCEClient;
-}(), (_applyDecoratedDescriptor(_class.prototype, "exchangeCodeForToken", [autobind_decorator__WEBPACK_IMPORTED_MODULE_3__["boundMethod"]], Object.getOwnPropertyDescriptor(_class.prototype, "exchangeCodeForToken"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "authenticate", [autobind_decorator__WEBPACK_IMPORTED_MODULE_3__["boundMethod"]], Object.getOwnPropertyDescriptor(_class.prototype, "authenticate"), _class.prototype)), _class);
+}();
+
 /* harmony default export */ __webpack_exports__["default"] = (PKCEClient);
 
 /***/ }),
@@ -25388,6 +25285,46 @@ __webpack_require__.r(__webpack_exports__);
 function base64URLEncode(str) {
   return str.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
+
+/***/ }),
+
+/***/ "./src/deferred.js":
+/*!*************************!*\
+  !*** ./src/deferred.js ***!
+  \*************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Deferred = function Deferred(executor) {
+  _classCallCheck(this, Deferred);
+
+  var obj = {};
+  var promise = new Promise(function (resolve, reject) {
+    obj.resolve = resolve;
+    obj.reject = reject;
+    executor && executor(resolve, reject);
+  });
+  promise.done = false;
+
+  promise.resolve = function () {
+    promise.done = true;
+    obj.resolve.apply(obj, arguments);
+  };
+
+  promise.reject = function () {
+    promise.done = true;
+    obj.reject.apply(obj, arguments);
+  };
+
+  promise.cancel = promise.reject;
+  return promise;
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (Deferred);
 
 /***/ }),
 

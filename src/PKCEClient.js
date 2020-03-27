@@ -1,7 +1,6 @@
 import '@babel/runtime/regenerator'
 import generateRandomChallengePair from './generateRandomChallengePair'
 import parse from 'url-parse'
-import { boundMethod } from 'autobind-decorator'
 
 const qs = parse.qs
 /*
@@ -29,7 +28,6 @@ class PKCEClient {
     return generateRandomChallengePair()
   }
 
-  @boundMethod
   async exchangeCodeForToken (code, verifier) {
     const { domain, clientId } = this
     const body = JSON.stringify({
@@ -62,7 +60,6 @@ class PKCEClient {
     return response.code
   }
 
-  @boundMethod
   async authenticate (options = {}, interactive = true) {
     const { domain, clientId } = this
     const { secret, hashed } = generateRandomChallengePair()

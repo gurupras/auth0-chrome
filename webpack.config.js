@@ -1,5 +1,5 @@
-const merge = require('webpack-merge');
-const path = require('path');
+const merge = require('webpack-merge')
+const path = require('path')
 
 const common = {
   context: __dirname,
@@ -39,7 +39,7 @@ const prod = {
 const dev = {
 
   entry: {
-    'auth0chrome': './index.js'
+    auth0chrome: './index.js'
   },
 
   mode: 'development',
@@ -47,4 +47,4 @@ const dev = {
   devtool: 'source-map'
 }
 
-module.exports = [ merge(common, prod), merge(common, dev) ];
+module.exports = [merge(common, prod), merge(common, dev)]
