@@ -1,82 +1,81 @@
 import '@babel/runtime/regenerator'
-import generateRandomChallengePair from './generateRandomChallengePair';
-import parse from 'url-parse';
+import generateRandomChallengePair from './generateRandomChallengePair'
+import parse from 'url-parse'
 import { boundMethod } from 'autobind-decorator'
 
-const qs = parse.qs;
+const qs = parse.qs
 /*
   Generic JavaScript PKCE Client, you can subclass this for React-Native,
   Cordova, Chrome, Some Other Environment which has its own handling for
   OAuth flows (like Windows?)
 */
 
-class PKCEClient{
+class PKCEClient {
   // These params will never change
   constructor (domain, clientId) {
-    this.domain = domain;
-    this.clientId = clientId;
+    this.domain = domain
+    this.clientId = clientId
   }
 
   async getAuthResult (url, interactive) {
-    throw new Error('Must be implemented by a sub-class');
+    throw new Error('Must be implemented by a sub-class')
   }
 
   getRedirectURL () {
-    throw new Error('Must be implemented by a sub-class');
+    throw new Error('Must be implemented by a sub-class')
   }
 
   @boundMethod
   async exchangeCodeForToken (code, verifier) {
-    const {domain, clientId} = this;
+    const { domain, clientId } = this
     const body = JSON.stringify({
       redirect_uri: this.getRedirectURL(),
       grant_type: 'authorization_code',
       code_verifier: verifier,
       client_id: clientId,
       code
-    });
+    })
     const result = await fetch(`https://${domain}/oauth/token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body
-    });
+    })
 
-    if(result.ok)
-     return result.json();
+    if (result.ok) { return result.json() }
 
-    throw Error(result.statusText);
+    throw Error(result.statusText)
   }
 
   extractCode (resultUrl) {
-    const response = parse(resultUrl, true).query;
+    const response = parse(resultUrl, true).query
 
     if (response.error) {
-      throw new Error(response.error_description || response.error);
+      throw new Error(response.error_description || response.error)
     }
 
-    return response.code;
+    return response.code
   }
 
   @boundMethod
   async authenticate (options = {}, interactive = true) {
-    const {domain, clientId} = this;
-    const {secret, hashed} = generateRandomChallengePair();
+    const { domain, clientId } = this
+    const { secret, hashed } = generateRandomChallengePair()
 
     Object.assign(options, {
       client_id: clientId,
       code_challenge: hashed,
       redirect_uri: this.getRedirectURL(),
       code_challenge_method: 'S256',
-      response_type: 'code',
-    });
+      response_type: 'code'
+    })
 
-    const url = `https://${domain}/authorize?${qs.stringify(options)}`;
-    const resultUrl = await this.getAuthResult(url, interactive);
-    const code = this.extractCode(resultUrl);
-    return this.exchangeCodeForToken(code, secret);
+    const url = `https://${domain}/authorize?${qs.stringify(options)}`
+    const resultUrl = await this.getAuthResult(url, interactive)
+    const code = this.extractCode(resultUrl)
+    return this.exchangeCodeForToken(code, secret)
   }
 }
 
-export default PKCEClient;
+export default PKCEClient
